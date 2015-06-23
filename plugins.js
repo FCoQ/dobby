@@ -7,9 +7,9 @@ function fetchPlugin(name, config) {
     return plugin;
 }
 
-exports.init = function(config_plugins) {
-	var plugins = [];
+var plugins = [];
 
+exports.init = function(config_plugins) {
 	if (typeof config_plugins == "object") {
         for (name in config_plugins) {
             if (typeof config_plugins[name] == "object") {
@@ -25,5 +25,14 @@ exports.init = function(config_plugins) {
         }
     }
 
-    return plugins;
+    return exports;
 }
+
+exports.onMessage = function(msg) {
+	plugins.forEach(function(item) {
+		if (typeof item.onMessage == "function") {
+			item.onMessage(msg);
+		}
+	})
+}
+

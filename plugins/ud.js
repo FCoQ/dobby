@@ -1,5 +1,5 @@
 // urban dictionary plugin for Dobby
 
 exports.onMessage = function(msg) {
-	console.log("got a message!");
+	console.log("ud: got a message! " + msg);
 }

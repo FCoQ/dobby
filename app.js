@@ -6,5 +6,5 @@ require('./config').init(function(config) {
     console.info("Loading plugins...");
     var plugins = require('./plugins').init(config.get("plugins"));
 
-    console.log(plugins);
+    plugins.onMessage("test");
 })
