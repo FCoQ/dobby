@@ -1,0 +1,9 @@
+[bot]
+name = "Dobby"
+
+[server]
+host = "127.0.0.1:10011"
+user = "serveradmin"
+pass = "PaSsWoRd"
+
+
