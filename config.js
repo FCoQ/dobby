@@ -1,11 +1,12 @@
 var fs   = require('fs'),
-    toml = require('toml');
+    toml = require('toml'),
+    console = require('better-console');
 
 // load the configuration file
 exports.init = function(cb) {
     fs.readFile("config.toml", function(err, config) {
         if (err) {
-            console.log("Error reading configuration file: " + err);
+            console.error("Error reading configuration file: " + err);
         } else {
             config = toml.parse(config);
 
