@@ -10,8 +10,9 @@ exports.init = function(cb) {
             config = toml.parse(config);
 
             var new_config = {
+                _config: config,
                 get: function(field) {
-                    var obj = config;
+                    var obj = this._config;
                     var prop, props = field.split('.');
 
                     for (var i = 0, iLen = props.length - 1; i < iLen; i++) {
