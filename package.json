@@ -17,6 +17,7 @@
         "bot"
     ],
     "dependencies": {
-        "toml": "*"
+        "toml": "*",
+        "better-console": "*"
     }
 }
