@@ -28,10 +28,10 @@ exports.init = function(config_plugins) {
     return exports;
 }
 
-exports.onMessage = function(msg) {
+exports.onMessage = function(msg, dobby) {
 	plugins.forEach(function(item) {
 		if (typeof item.onMessage == "function") {
-			item.onMessage(msg);
+			item.onMessage(msg, dobby);
 		}
 	})
 }
