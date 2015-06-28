@@ -15,7 +15,15 @@ function connect(ctx, config) {
                     {client_login_name: config.get("server.user"), client_login_password: config.get("server.pass")},
                     function(err, response) {
                         ctx.cl.send("use", {sid: 1}, function(err, response) {
-                            ctx.ready = true;
+                            ctx.cl.send("clientupdate", {client_nickname: ctx.username}, function(err, response) {
+                                ctx.cl.send("whoami", {}, function(err, response) {
+                                    ctx.clid = response.client_id;
+
+                                    ctx.cl.send("clientmove", {clid: ctx.clid, cid: ctx.cid}, function(err, response) {
+                                        ctx.ready = true;
+                                    })
+                                })
+                            })
                         })
                     }
         );
@@ -44,13 +52,15 @@ function connect(ctx, config) {
     })
 }
 
-module.exports = function TS3Bot(config) {
+module.exports = function TS3Bot(config, username, cid) {
     var ctx = {
         cl: null,
         enabled: true,
         restarted: false,
         ready: false,
-        queue: []
+        username: username,
+        cid: cid,
+        clid: 0
     };
 
     connect(ctx, config);
@@ -72,5 +82,27 @@ module.exports = function TS3Bot(config) {
                 self.send(cmd, options, cb);
             }, 1000);
         }
+    }
+
+    this.move_to_channel = function(cid, cb) {
+        ctx.cid = cid;
+
+        this.send("clientmove", {clid: ctx.clid, cid: ctx.cid}, function(err, response) {
+            cb(err);
+        })
+    }
+
+    this.change_username = function(name, cb) {
+        ctx.username = name;
+
+        this.send("clientupdate", {client_nickname: ctx.username}, function(err, response) {
+            cb(err);
+        })
+    }
+
+    this.send_channel_message = function(msg, cb) {
+        this.send("sendtextmessage", {targetmode: 2, msg: msg}, function(err) {
+            cb(err);
+        })
     }
 }

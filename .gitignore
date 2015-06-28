@@ -12,3 +12,5 @@ node_modules
 
 # configuration file for the bot
 config.toml
+
+.idea
