@@ -18,6 +18,8 @@
     ],
     "dependencies": {
         "toml": "*",
-        "better-console": "*"
+        "better-console": "*",
+        "node-teamspeak": "qshane/node-teamspeak",
+        "async": "*"
     }
 }

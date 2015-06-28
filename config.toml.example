@@ -2,7 +2,8 @@
 name = "Dobby"
 
 [server]
-host = "127.0.0.1:10011"
+host = "127.0.0.1"
+port = 10011
 user = "serveradmin"
 pass = "PaSsWoRd"
 
