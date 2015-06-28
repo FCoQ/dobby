@@ -2,6 +2,17 @@ var console = require('better-console');
 var bot = require('./bot');
 var async = require('async');
 
+function makeid()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    for( var i=0; i < 12; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+
 console.info("Loading configuration...");
 require('./config').init(function(config) {
 
@@ -9,8 +20,6 @@ require('./config').init(function(config) {
     var plugins = require('./plugins').init(config.get("plugins"));
 
     var supervisor = new bot(config, config.get("bot.name"), 1);
-
-    var watcherName = 0;
 
     var ctx = {
         watchers: {},
@@ -40,8 +49,7 @@ require('./config').init(function(config) {
                         // create a watcher
 
                         console.info("Creating new watcher for channel " + client.cid);
-                        var watcher = new bot(config, "watcher" + watcherName, client.cid);
-                        watcherName += 1;
+                        var watcher = new bot(config, makeid(), client.cid);
 
                         ctx.watchers[client.cid] = watcher;
 
@@ -49,6 +57,10 @@ require('./config').init(function(config) {
                             watcher.on_channel_message(function(data) {
                                 plugins.onMessage(data.msg, new function() {
                                     this.respond = function(msg, cb) {
+                                        if (msg.length >= 500) {
+                                            msg = msg.substr(0, 500) + "[...]";
+                                        }
+
                                         supervisor.move_to_channel(client.cid, function(err) {
                                             if (err) {
                                                 console.warn("Supervisor couldn't move to channel " + client.cid);
