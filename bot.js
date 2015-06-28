@@ -72,7 +72,10 @@ function connect(ctx, config) {
     })
 
     ctx.cl.on('textmessage', function(data) {
-        ctx.on_channel_message(data);
+        if (ctx.enabled && (data.invokername != config.get("bot.name"))) {
+            // TODO: make this use the bot's invokeruid instead
+            ctx.on_channel_message(data);
+        }
     })
 }
 
@@ -99,9 +102,7 @@ module.exports = function TS3Bot(config, username, cid) {
     }
 
     this.on_channel_message = function(cb) {
-        if (ctx.enabled) {
-            ctx.on_channel_message = cb;
-        }
+        ctx.on_channel_message = cb;
     }
 
     this.send = function(cmd, options, cb) {
@@ -119,6 +120,9 @@ module.exports = function TS3Bot(config, username, cid) {
         ctx.cid = cid;
 
         this.send("clientmove", {clid: ctx.clid, cid: ctx.cid}, function(err, response) {
+            if (err && err.id == 770) {
+                err = null;
+            }
             cb(err);
         })
     }

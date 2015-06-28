@@ -39,7 +39,7 @@ require('./config').init(function(config) {
                     if (typeof ctx.watchers[client.cid] == "undefined") {
                         // create a watcher
 
-                        console.info("Creating new watcher for channel " + client.cid + " (" + watcherName + ")");
+                        console.info("Creating new watcher for channel " + client.cid);
                         var watcher = new bot(config, "watcher" + watcherName, client.cid);
                         watcherName += 1;
 
@@ -47,7 +47,20 @@ require('./config').init(function(config) {
 
                         watcher.watch_channel(function() {
                             watcher.on_channel_message(function(data) {
-                                plugins.onMessage(data);
+                                plugins.onMessage(data.msg, new function() {
+                                    this.respond = function(msg, cb) {
+                                        supervisor.move_to_channel(client.cid, function(err) {
+                                            if (err) {
+                                                console.warn("Supervisor couldn't move to channel " + client.cid);
+                                                return;
+                                            }
+
+                                            supervisor.send_channel_message(msg, function() {
+                                                cb()
+                                            })
+                                        });
+                                    }
+                                });
                             });
                             cb();
                         })
@@ -73,21 +86,5 @@ require('./config').init(function(config) {
     }, function(err) {
 
     });
-
-/*
-    supervisor.send_channel_message("testing one", function() {
-        supervisor.send_channel_message("testing two", function() {
-            supervisor.change_username("AlsoDobby", function() {
-                supervisor.send_channel_message("testing THREE", function() {
-                    supervisor.watch_channel(function() {
-                        supervisor.on_channel_message(function(something) {
-                            console.log("woohoo: " + JSON.stringify(something));
-                        })
-                    })
-                })
-            })
-        })
-    })
-*/
 
 })
