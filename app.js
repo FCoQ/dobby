@@ -14,7 +14,11 @@ require('./config').init(function(config) {
         supervisor.send_channel_message("testing two", function() {
             supervisor.change_username("AlsoDobby", function() {
                 supervisor.send_channel_message("testing THREE", function() {
-                    console.log("done");
+                    supervisor.watch_channel(function() {
+                        supervisor.on_channel_message(function(something) {
+                            console.log("woohoo: " + JSON.stringify(something));
+                        })
+                    })
                 })
             })
         })

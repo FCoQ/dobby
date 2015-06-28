@@ -70,6 +70,10 @@ function connect(ctx, config) {
             }, 5000);
         }
     })
+
+    ctx.cl.on('textmessage', function(data) {
+        ctx.on_channel_message(data);
+    })
 }
 
 module.exports = function TS3Bot(config, username, cid) {
@@ -80,7 +84,8 @@ module.exports = function TS3Bot(config, username, cid) {
         ready: false,
         username: username,
         cid: cid,
-        clid: 0
+        clid: 0,
+        on_channel_message: function() {}
     };
 
     connect(ctx, config);
@@ -91,6 +96,10 @@ module.exports = function TS3Bot(config, username, cid) {
         if (ctx.cl) {
             ctx.cl.close();
         }
+    }
+
+    this.on_channel_message = function(cb) {
+        ctx.on_channel_message = cb;
     }
 
     this.send = function(cmd, options, cb) {
@@ -122,6 +131,12 @@ module.exports = function TS3Bot(config, username, cid) {
 
     this.send_channel_message = function(msg, cb) {
         this.send("sendtextmessage", {targetmode: 2, msg: msg}, function(err) {
+            cb(err);
+        })
+    }
+
+    this.watch_channel = function(cb) {
+        this.send("servernotifyregister", {event: "textchannel", id: ctx.cid}, function(err) {
             cb(err);
         })
     }
