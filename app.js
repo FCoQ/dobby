@@ -56,7 +56,9 @@ require('./config').init(function(config) {
                                             }
 
                                             supervisor.send_channel_message(msg, function() {
-                                                cb()
+                                                if (cb) {
+                                                    cb()
+                                                }
                                             })
                                         });
                                     }
