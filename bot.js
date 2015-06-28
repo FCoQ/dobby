@@ -4,6 +4,7 @@
 
 var console = require('better-console');
 var ts3 = require('node-teamspeak');
+var async = require('async');
 
 function connect(ctx, config) {
     ctx.restarted = false;
@@ -11,42 +12,48 @@ function connect(ctx, config) {
     ctx.cl = new ts3(config.get("server.host"), config.get("server.port"));
 
     ctx.cl.on('connect', function() {
-        ctx.cl.send("login",
+        async.series([
+            function (cb) {
+                ctx.cl.send("login",
                     {client_login_name: config.get("server.user"), client_login_password: config.get("server.pass")},
-                    function(err, response) {
-                        if (err) {
-                            console.warn("server query login failure");
-                            ctx.cl.close();
-                            return;
-                        }
-                        ctx.cl.send("use", {sid: 1}, function(err, response) {
-                            if (err) {
-                                console.warn("couldn't select virtual server 1");
-                                ctx.cl.close();
-                                return;
-                            }
-                            ctx.cl.send("clientupdate", {client_nickname: ctx.username}, function(err, response) {
-                                if (err) {
-                                    console.warn("couldn't update nickname to " + ctx.username);
-                                    ctx.cl.close();
-                                    return;
-                                }
-                                ctx.cl.send("whoami", {}, function(err, response) {
-                                    if (err) {
-                                        console.warn("'whoami' command failed");
-                                        ctx.cl.close();
-                                        return;
-                                    }
-                                    ctx.clid = response.client_id;
+                    cb);
+            },
+            function (cb) {
+                ctx.cl.send("use", {sid: 1}, cb);
+            },
+            function (cb) {
+                ctx.cl.send("clientupdate", {client_nickname: ctx.username}, cb);
+            },
+            function (cb) {
+                ctx.cl.send("whoami", {client_nickname: ctx.username}, function (err, response) {
+                    if (err) {
+                        cb(err);
+                    } else {
+                        ctx.clid = response.client_id;
 
-                                    ctx.cl.send("clientmove", {clid: ctx.clid, cid: ctx.cid}, function(err, response) {
-                                        ctx.ready = true;
-                                    })
-                                })
-                            })
-                        })
+                        cb();
                     }
-        );
+                });
+            },
+            function (cb) {
+                ctx.cl.send("clientmove", {clid: ctx.clid, cid: ctx.cid}, function(err) {
+                    if (err) {
+                        if (err.id != 770) {
+                            return cb(err);
+                        }
+                    }
+                    cb();
+                });
+            }
+        ], function (err) {
+            if (err) {
+                console.warn("Supervisor connection error: " + JSON.stringify(err));
+                ctx.cl.close();
+                return;
+            }
+
+            ctx.ready = true;
+        })
     });
 
     ctx.cl.on('close', function() {
