@@ -59,10 +59,12 @@ require('./config').init(function(config) {
                 }
             }, function() {
                 for (var defunctChannel in unseenMap) {
-                    console.info("Watcher for channel " + defunctChannel + " no longer needed, closing");
-                    ctx.watchers[defunctChannel].close();
+                    if (unseenMap.hasOwnProperty(defunctChannel)) {
+                        console.info("Watcher for channel " + defunctChannel + " no longer needed, closing");
+                        ctx.watchers[defunctChannel].close();
 
-                    delete ctx.watchers[defunctChannel];
+                        delete ctx.watchers[defunctChannel];
+                    }
                 }
 
                 next();
