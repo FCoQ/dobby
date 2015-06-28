@@ -17,55 +17,61 @@ require('./config').init(function(config) {
         client_list: {}
     };
 
-    function syncWatchers() {
-        var unseenMap = {};
-        for (cid in ctx.watchers) {
-            unseenMap[cid] = true;
-        }
-
-        ctx.client_list.forEach(function(client) {
-            if (client.client_type == 0) {
-                // if it's a normal user
-
-                delete unseenMap[client.cid];
-
-                if (typeof ctx.watchers[client.cid] == "undefined") {
-                    // create a watcher
-
-                    console.info("Creating new watcher for channel " + client.cid + " (" + watcherName + ")");
-                    var watcher = new bot(config, "watcher" + watcherName, client.cid);
-                    watcherName += 1;
-
-                    ctx.watchers[client.cid] = watcher;
-
-                    watcher.watch_channel(function() {
-                        watcher.on_channel_message(function(data) {
-                            plugins.onMessage(data);
-                        })
-                    })
-                }
-            }
-        })
-
-        for (var defunctChannel in unseenMap) {
-            console.info("Watcher for channel " + defunctChannel + " no longer needed, closing");
-            ctx.watchers[defunctChannel].close();
-
-            delete ctx.watchers[defunctChannel];
-        }
-    }
-
-    setInterval(function() {
+    async.forever(function(next) {
         supervisor.send("clientlist", function(err, response) {
             if (err) {
                 console.warn("Couldn't receive client list!");
+                next();
                 return;
             }
 
             ctx.client_list = response;
-            syncWatchers();
+
+            var unseenMap = {};
+            for (cid in ctx.watchers) {
+                unseenMap[cid] = true;
+            }
+
+            async.eachSeries(ctx.client_list, function(client, cb) {
+                if (client.client_type == 0) {
+                    delete unseenMap[client.cid];
+
+                    if (typeof ctx.watchers[client.cid] == "undefined") {
+                        // create a watcher
+
+                        console.info("Creating new watcher for channel " + client.cid + " (" + watcherName + ")");
+                        var watcher = new bot(config, "watcher" + watcherName, client.cid);
+                        watcherName += 1;
+
+                        ctx.watchers[client.cid] = watcher;
+
+                        watcher.watch_channel(function() {
+                            watcher.on_channel_message(function(data) {
+                                plugins.onMessage(data);
+                            });
+                            cb();
+                        })
+                    } else {
+                        cb();
+                    }
+                } else {
+                    cb();
+                }
+            }, function() {
+                for (var defunctChannel in unseenMap) {
+                    console.info("Watcher for channel " + defunctChannel + " no longer needed, closing");
+                    ctx.watchers[defunctChannel].close();
+
+                    delete ctx.watchers[defunctChannel];
+                }
+
+                next();
+            })
         })
-    }, 5000);
+    }, function(err) {
+
+    });
+
 /*
     supervisor.send_channel_message("testing one", function() {
         supervisor.send_channel_message("testing two", function() {
