@@ -8,7 +8,7 @@ require('./config').init(function(config) {
     console.info("Loading plugins...");
     var plugins = require('./plugins').init(config.get("plugins"));
 
-    var supervisor = new bot(config, "Dobby", 3);
+    var supervisor = new bot(config, config.get("bot.name"), 3);
 
     supervisor.send_channel_message("testing one", function() {
         supervisor.send_channel_message("testing two", function() {
