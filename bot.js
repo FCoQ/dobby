@@ -52,7 +52,7 @@ function connect(ctx, config) {
     ctx.cl.on('close', function() {
         ctx.ready = false;
         if (ctx.enabled && !ctx.restarted) {
-            console.warn("socket error, reconnecting..");
+            console.warn("connection closed, reconnecting..");
             ctx.restarted = true;
             setTimeout(function() {
                 connect(ctx, config);
@@ -60,10 +60,10 @@ function connect(ctx, config) {
         }
     })
 
-    ctx.cl.on('error', function() {
+    ctx.cl.on('error', function(err) {
         ctx.ready = false;
         if (ctx.enabled && !ctx.restarted) {
-            console.warn("connection closed, reconnecting..");
+            console.warn("socket error " + err + ", reconnecting..");
             ctx.restarted = true;
             setTimeout(function() {
                 connect(ctx, config);
@@ -99,7 +99,9 @@ module.exports = function TS3Bot(config, username, cid) {
     }
 
     this.on_channel_message = function(cb) {
-        ctx.on_channel_message = cb;
+        if (ctx.enabled) {
+            ctx.on_channel_message = cb;
+        }
     }
 
     this.send = function(cmd, options, cb) {
