@@ -20,6 +20,7 @@
         "toml": "*",
         "better-console": "*",
         "node-teamspeak": "qshane/node-teamspeak",
-        "async": "*"
+        "async": "*",
+        "unirest": "*"
     }
 }
