@@ -17,6 +17,7 @@ exports.onMessage = function(msg, dobby) {
                     if (first) {
                         dobby.respond("[B]NSFW![/B] [URL]" + first[1] + "[/URL]");
                     } else {
+                        dobby.respond("No results.");
                     }
                 } else {
                     dobby.respond("Failed!");
