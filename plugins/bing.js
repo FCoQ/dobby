@@ -1,7 +1,6 @@
 // bing dictionary plugin for Dobby
 
 var unirest = require('unirest');
-var fs = require('fs');
 
 exports.onMessage = function(msg, dobby) {
     var terms = msg.split(" ");
