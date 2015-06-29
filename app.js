@@ -118,7 +118,7 @@ require('./config').init(function(config) {
                                         })
                                     }
 
-                                    this.get_client = function() {
+                                    this.client_from = function() {
                                         return new Client(data.invokerid);
                                     }
                                 });
