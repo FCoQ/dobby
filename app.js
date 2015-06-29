@@ -55,7 +55,36 @@ require('./config').init(function(config) {
 
                         watcher.watch_channel(function() {
                             watcher.on_channel_message(function(data) {
-                                plugins.onMessage(data.msg, new function() {
+                                var Client = function(clid) {
+                                    var clientInfo = {};
+
+                                    this.get_ip = function(cb) {
+                                        this.update(function(err) {
+                                            cb(err, clientInfo.connection_client_ip)
+                                        })
+                                    }
+
+                                    this.get_uid = function(cb) {
+                                        this.update(function(err) {
+                                            cb(err, clientInfo.client_unique_identifier)
+                                        })
+                                    }
+
+                                    this.update = function(cb) {
+                                        supervisor.get_client_info(clid, function(err, response) {
+                                            if (err) {
+                                                clientInfo = {}
+                                                cb(err)
+                                            } else {
+                                                clientInfo = response;
+                                                cb(null)
+                                            }
+                                        })
+                                    }
+
+                                };
+
+                                plugins.onMessage(String(data.msg), new function() {
                                     this.respond = function(msg, cb) {
                                         if (msg.length >= 500) {
                                             msg = msg.substr(0, 500) + "[...]";
@@ -73,6 +102,24 @@ require('./config').init(function(config) {
                                                 }
                                             })
                                         });
+                                    }
+
+                                    this.client_list = function(cb) {
+                                        supervisor.get_client_list(function(err, response) {
+                                            if (err) {
+                                                cb(err)
+                                            } else {
+                                                cb(err, response.filter(function(client) {
+                                                    return client.client_type == 0
+                                                }).map(function(client) {
+                                                    return new Client(client.clid)
+                                                }))
+                                            }
+                                        })
+                                    }
+
+                                    this.client_from = function() {
+                                        return new Client(data.invokerid);
                                     }
                                 });
                             });
