@@ -64,6 +64,12 @@ require('./config').init(function(config) {
                                         })
                                     }
 
+                                    this.get_uid = function(cb) {
+                                        this.update(function(err) {
+                                            cb(err, clientInfo.client_unique_identifier)
+                                        })
+                                    }
+
                                     this.update = function(cb) {
                                         supervisor.get_client_info(clid, function(err, response) {
                                             if (err) {
