@@ -153,4 +153,16 @@ module.exports = function TS3Bot(config, username, cid) {
             cb(err);
         })
     }
+
+    this.get_client_info = function(clid, cb) {
+        this.send("clientinfo", {clid: clid}, function(err, response) {
+            cb(err, response);
+        })
+    }
+
+    this.get_client_list = function(cb) {
+        this.send("clientlist", {}, function(err, response) {
+            cb(err, response);
+        })
+    }
 }
