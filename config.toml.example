@@ -10,8 +10,5 @@ pass = "PaSsWoRd"
 
 [plugins]
 ud = true
-bing = false
-
-[plugins.something]
-on = true
-test = "Hello, Joe!"
+bing = true
+img = true
