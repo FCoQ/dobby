@@ -88,6 +88,9 @@ require('./config').init(function(config) {
                                 };
 
                                 plugins.onMessage(String(data.msg), new function() {
+                                    this.bot = supervisor;
+                                    this.cid = client.cid;
+
                                     this.respond = function(msg, cb) {
                                         if (msg.length >= 500) {
                                             msg = msg.substr(0, 500) + "[...]";
