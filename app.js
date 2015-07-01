@@ -55,8 +55,11 @@ require('./config').init(function(config) {
 
                         watcher.watch_channel(function() {
                             watcher.on_channel_message(function(data) {
-                                var Client = function(clid) {
+                                var Client = function(clid, name) {
                                     var clientInfo = {};
+                                    this.get_name = function(cb){
+                                        cb(null, name)
+                                    }
 
                                     this.get_ip = function(cb) {
                                         this.update(function(err) {
@@ -112,14 +115,37 @@ require('./config').init(function(config) {
                                                 cb(err, response.filter(function(client) {
                                                     return client.client_type == 0
                                                 }).map(function(client) {
-                                                    return new Client(client.clid)
+                                                    return new Client(client.clid, client.client_nickname)
                                                 }))
+                                            }
+                                        })
+                                    }
+                                    this.find_clients = function(partial, cb) {
+                                        this.client_list( function(err, clients){
+                                            if(err){
+                                                cb(err)
+                                            }else{
+                                                async.filter(clients, function(client, cb){
+                                                    client.get_name( function(err, name){
+                                                        if(err) {
+                                                            cb(false)
+                                                        }else{
+                                                            if(name.toLowerCase().match(partial.toLowerCase())){
+                                                                cb(true)
+                                                            }else{
+                                                                cb(false)
+                                                            }
+                                                        }
+                                                    })
+                                                }, function(clients){
+                                                    cb(null, clients)
+                                                })
                                             }
                                         })
                                     }
 
                                     this.client_from = function() {
-                                        return new Client(data.invokerid);
+                                        return new Client(data.invokerid, data.invokername);
                                     }
                                 });
                             });
