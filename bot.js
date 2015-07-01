@@ -165,4 +165,14 @@ module.exports = function TS3Bot(config, username, cid) {
             cb(err, response);
         })
     }
+
+    // send a heartbeat every 5 seconds to prevent a timeout
+    var self = this;
+    async.forever(function(next) {
+        setTimeout(function() {
+            self.send("whoami", {}, function() {
+                next()
+            })
+        }, 5000)
+    })
 }
