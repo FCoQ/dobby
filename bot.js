@@ -170,8 +170,10 @@ module.exports = function TS3Bot(config, username, cid) {
     var self = this;
     async.forever(function(next) {
         setTimeout(function() {
-            self.send("whoami", {}, function() {
-                next()
+            self.send("whoami", {}, function(err) {
+                if (ctx.enabled) {
+                    next()
+                }
             })
         }, 5000)
     })
