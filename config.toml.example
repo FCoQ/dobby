@@ -9,6 +9,9 @@ pass = "PaSsWoRd"
 
 
 [plugins]
-ud = true
 bing = true
+cid = true
+google = true
+howhot = true
 img = true
+ud = true
