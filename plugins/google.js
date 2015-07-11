@@ -7,7 +7,7 @@ exports.onMessage = function(msg, dobby) {
     var command = terms.shift();
     terms = terms.join(" ");
 
-    if (command == '.google') {
+    if (command == '.google' || command == '.g') {
         unirest.get("http://ajax.googleapis.com/ajax/services/search/web")
             .query({safe: "off",v: "1.0", q: terms})
             .end(function(response) {
