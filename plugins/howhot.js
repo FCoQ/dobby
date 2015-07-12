@@ -35,7 +35,7 @@ exports.onMessage = function(msg, dobby) {
                        }
                    })
                }else{
-                   cb(null, dobby.client_from())
+                   cb(null, dobby.client_from)
                }
            },
            function(client, cb){

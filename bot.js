@@ -142,6 +142,12 @@ module.exports = function TS3Bot(config, username, cid) {
         })
     }
 
+    this.send_private_message = function(clid, msg, cb) {
+        this.send("sendtextmessage", {targetmode: 1, target: clid, msg: msg}, function(err) {
+	    cb(err);
+	});
+    }
+
     this.send_channel_message = function(msg, cb) {
         this.send("sendtextmessage", {targetmode: 2, msg: msg}, function(err) {
             cb(err);

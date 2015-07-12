@@ -57,6 +57,11 @@ require('./config').init(function(config) {
                             watcher.on_channel_message(function(data) {
                                 var Client = function(clid, name) {
                                     var clientInfo = {};
+
+				    this.private_message = function(contents, cb) {
+					supervisor.send_private_message(clid, contents, cb);
+				    }
+
                                     this.get_name = function(cb){
                                         cb(null, name)
                                     }
@@ -147,9 +152,7 @@ require('./config').init(function(config) {
                                         })
                                     }
 
-                                    this.client_from = function() {
-                                        return new Client(data.invokerid, data.invokername);
-                                    }
+                                    this.client_from = new Client(data.invokerid, data.invokername);
                                 });
                             });
                             cb();
