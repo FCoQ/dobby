@@ -9,9 +9,15 @@ pass = "PaSsWoRd"
 
 
 [plugins]
+admin = true
 bing = true
 cid = true
 google = true
 howhot = true
 img = true
 ud = true
+
+# these are uids of admins
+[admins]
+sean = "tIfU8lpVDfj1EnNbRuHmtNp/wX0="
+quibs = "SoHHSfrTKmJOsJ3TKjhuso84rhA="

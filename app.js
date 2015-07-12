@@ -26,6 +26,128 @@ require('./config').init(function(config) {
         client_list: {}
     };
 
+    var Client = function(clid, name) {
+        var clientInfo = {client_nickname: name};
+        var disableUpdate = false;
+
+        this.disable_updates = function() {
+            disableUpdate = true;
+        }
+
+        this.private_message = function(contents, cb) {
+            if (!cb) {
+                cb = function() {}
+            }
+            supervisor.send_private_message(clid, contents, cb);
+        }
+
+        this.is_admin = function(cb) {
+            this.get_uid(function(err, uid) {
+                if (err) {
+                    cb(err)
+                } else {
+                    var admins = config.get("admins");
+
+                    if (typeof admins == "object") {
+                        for (name in admins) {
+                            if (admins[name] == uid) {
+                                cb(null, true)
+                                return;
+                            }
+                        }
+                        cb(null, false);
+                    } else {
+                        console.log("No admins are defined in the config file.");
+                        cb(null, false);
+                    }
+                }
+            })
+        }
+
+        this.get_name = function(cb){
+            cb(null, clientInfo.client_nickname)
+        }
+
+        this.get_cid = function(cb) {
+            this.update(function(err) {
+                cb(err, clientInfo.cid)
+            })
+        }
+
+        this.get_clid = function(cb) {
+            cb(null, clid)
+        }
+
+        this.get_ip = function(cb) {
+            this.update(function(err) {
+                cb(err, clientInfo.connection_client_ip)
+            })
+        }
+
+        this.get_uid = function(cb) {
+            this.update(function(err) {
+                cb(err, clientInfo.client_unique_identifier)
+            })
+        }
+
+        this.update = function(cb) {
+            if (disableUpdate) {
+                cb(null)
+            } else {
+                supervisor.get_client_info(clid, function(err, response) {
+                    if (err) {
+                        clientInfo = {}
+                        cb(err)
+                    } else {
+                        clientInfo = response;
+                        cb(null)
+                    }
+                })
+            }
+        }
+    };
+
+    var generic_helpers = {
+        client_list: function(cb) {
+            supervisor.get_client_list(function(err, response) {
+                if (err) {
+                    cb(err)
+                } else {
+                    cb(err, response.filter(function(client) {
+                        return client.client_type == 0
+                    }).map(function(client) {
+                        return new Client(client.clid, client.client_nickname)
+                    }))
+                }
+            })
+        },
+        find_clients: function(partial, cb) {
+            this.client_list( function(err, clients){
+                if(err){
+                    cb(err)
+                }else{
+                    async.filter(clients, function(client, cb){
+                        client.get_name( function(err, name){
+                            if(err) {
+                                cb(false)
+                            }else{
+                                if(name.toLowerCase().match(partial.toLowerCase())){
+                                    cb(true)
+                                }else{
+                                    cb(false)
+                                }
+                            }
+                        })
+                    }, function(clients){
+                        cb(null, clients)
+                    })
+                }
+            })
+        }
+    };
+
+    plugins.startPlugins(generic_helpers);
+
     async.forever(function(next) {
         supervisor.send("clientlist", function(err, response) {
             if (err) {
@@ -55,46 +177,13 @@ require('./config').init(function(config) {
 
                         watcher.watch_channel(function() {
                             watcher.on_channel_message(function(data) {
-                                var Client = function(clid, name) {
-                                    var clientInfo = {};
-
-				    this.private_message = function(contents, cb) {
-					supervisor.send_private_message(clid, contents, cb);
-				    }
-
-                                    this.get_name = function(cb){
-                                        cb(null, name)
-                                    }
-
-                                    this.get_ip = function(cb) {
-                                        this.update(function(err) {
-                                            cb(err, clientInfo.connection_client_ip)
-                                        })
-                                    }
-
-                                    this.get_uid = function(cb) {
-                                        this.update(function(err) {
-                                            cb(err, clientInfo.client_unique_identifier)
-                                        })
-                                    }
-
-                                    this.update = function(cb) {
-                                        supervisor.get_client_info(clid, function(err, response) {
-                                            if (err) {
-                                                clientInfo = {}
-                                                cb(err)
-                                            } else {
-                                                clientInfo = response;
-                                                cb(null)
-                                            }
-                                        })
-                                    }
-
-                                };
-
                                 plugins.onMessage(String(data.msg), new function() {
-                                    this.bot = supervisor;
                                     this.cid = client.cid;
+                                    this.client_from = new Client(data.invokerid, data.invokername);
+
+                                    this.send = function(cmd, options, cb) {
+                                        supervisor.send(cmd, options, cb);
+                                    }
 
                                     this.respond = function(msg, cb) {
                                         if (msg.length >= 500) {
@@ -115,44 +204,8 @@ require('./config').init(function(config) {
                                         });
                                     }
 
-                                    this.client_list = function(cb) {
-                                        supervisor.get_client_list(function(err, response) {
-                                            if (err) {
-                                                cb(err)
-                                            } else {
-                                                cb(err, response.filter(function(client) {
-                                                    return client.client_type == 0
-                                                }).map(function(client) {
-                                                    return new Client(client.clid, client.client_nickname)
-                                                }))
-                                            }
-                                        })
-                                    }
-                                    this.find_clients = function(partial, cb) {
-                                        this.client_list( function(err, clients){
-                                            if(err){
-                                                cb(err)
-                                            }else{
-                                                async.filter(clients, function(client, cb){
-                                                    client.get_name( function(err, name){
-                                                        if(err) {
-                                                            cb(false)
-                                                        }else{
-                                                            if(name.toLowerCase().match(partial.toLowerCase())){
-                                                                cb(true)
-                                                            }else{
-                                                                cb(false)
-                                                            }
-                                                        }
-                                                    })
-                                                }, function(clients){
-                                                    cb(null, clients)
-                                                })
-                                            }
-                                        })
-                                    }
-
-                                    this.client_from = new Client(data.invokerid, data.invokername);
+                                    this.client_list = generic_helpers.client_list;
+                                    this.find_clients = generic_helpers.find_clients;
                                 });
                             });
                             cb();

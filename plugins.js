@@ -1,5 +1,12 @@
+var fs = require('fs');
+
 function fetchPlugin(name, config) {
-    var plugin = require('./plugins/' + name);
+    var path = "./plugins/" + name;
+    if (!fs.existsSync(path + '.js')) {
+        path = "./plugins/contrib/" + name;
+    }
+
+    var plugin = require(path);
     if (typeof plugin.config == "function") {
         plugin.config(config);
     }
@@ -26,6 +33,14 @@ exports.init = function(config_plugins) {
     }
 
     return exports;
+}
+
+exports.startPlugins = function(dobby) {
+    plugins.forEach(function(item) {
+        if (typeof item.init == "function") {
+            item.init(dobby);
+        }
+    })
 }
 
 exports.onMessage = function(msg, dobby) {
