@@ -58,9 +58,35 @@ require('./config').init(function(config) {
                                 var Client = function(clid, name) {
                                     var clientInfo = {};
 
-				    this.private_message = function(contents, cb) {
-					supervisor.send_private_message(clid, contents, cb);
-				    }
+                                    this.private_message = function(contents, cb) {
+                                        if (!cb) {
+                                            cb = function() {}
+                                        }
+                                        supervisor.send_private_message(clid, contents, cb);
+                                    }
+
+                                    this.is_admin = function(cb) {
+                                        this.get_uid(function(err, uid) {
+                                            if (err) {
+                                                cb(err)
+                                            } else {
+                                                var admins = config.get("admins");
+
+                                                if (typeof admins == "object") {
+                                                    for (name in admins) {
+                                                        if (admins[name] == uid) {
+                                                            cb(null, true)
+                                                            return;
+                                                        }
+                                                    }
+                                                    cb(null, false);
+                                                } else {
+                                                    console.log("No admins are defined in the config file.");
+                                                    cb(null, false);
+                                                }
+                                            }
+                                        })
+                                    }
 
                                     this.get_name = function(cb){
                                         cb(null, name)
@@ -93,8 +119,12 @@ require('./config').init(function(config) {
                                 };
 
                                 plugins.onMessage(String(data.msg), new function() {
-                                    this.bot = supervisor;
                                     this.cid = client.cid;
+                                    this.client_from = new Client(data.invokerid, data.invokername);
+
+                                    this.send = function(cmd, options, cb) {
+                                        supervisor.send(cmd, options, cb);
+                                    }
 
                                     this.respond = function(msg, cb) {
                                         if (msg.length >= 500) {
@@ -151,8 +181,6 @@ require('./config').init(function(config) {
                                             }
                                         })
                                     }
-
-                                    this.client_from = new Client(data.invokerid, data.invokername);
                                 });
                             });
                             cb();
