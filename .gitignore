@@ -17,3 +17,6 @@ config.toml
 
 # fork of their module for personal reasons
 node-teamspeak
+
+# contrib plugins
+plugins/contrib/*.js
