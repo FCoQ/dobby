@@ -27,7 +27,12 @@ require('./config').init(function(config) {
     };
 
     var Client = function(clid, name) {
-        var clientInfo = {};
+        var clientInfo = {client_nickname: name};
+        var disableUpdate = false;
+
+        this.disable_updates = function() {
+            disableUpdate = true;
+        }
 
         this.private_message = function(contents, cb) {
             if (!cb) {
@@ -60,7 +65,17 @@ require('./config').init(function(config) {
         }
 
         this.get_name = function(cb){
-            cb(null, name)
+            cb(null, clientInfo.client_nickname)
+        }
+
+        this.get_cid = function(cb) {
+            this.update(function(err) {
+                cb(err, clientInfo.cid)
+            })
+        }
+
+        this.get_clid = function(cb) {
+            cb(null, clid)
         }
 
         this.get_ip = function(cb) {
@@ -76,15 +91,19 @@ require('./config').init(function(config) {
         }
 
         this.update = function(cb) {
-            supervisor.get_client_info(clid, function(err, response) {
-                if (err) {
-                    clientInfo = {}
-                    cb(err)
-                } else {
-                    clientInfo = response;
-                    cb(null)
-                }
-            })
+            if (disableUpdate) {
+                cb(null)
+            } else {
+                supervisor.get_client_info(clid, function(err, response) {
+                    if (err) {
+                        clientInfo = {}
+                        cb(err)
+                    } else {
+                        clientInfo = response;
+                        cb(null)
+                    }
+                })
+            }
         }
     };
 
@@ -126,6 +145,8 @@ require('./config').init(function(config) {
             })
         }
     };
+
+    plugins.startPlugins(generic_helpers);
 
     async.forever(function(next) {
         supervisor.send("clientlist", function(err, response) {

@@ -35,6 +35,14 @@ exports.init = function(config_plugins) {
     return exports;
 }
 
+exports.startPlugins = function(dobby) {
+    plugins.forEach(function(item) {
+        if (typeof item.init == "function") {
+            item.init(dobby);
+        }
+    })
+}
+
 exports.onMessage = function(msg, dobby) {
 	plugins.forEach(function(item) {
 		if (typeof item.onMessage == "function") {
