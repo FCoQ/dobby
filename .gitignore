@@ -19,4 +19,4 @@ config.toml
 node-teamspeak
 
 # contrib plugins
-plugins/contrib/*.js
+plugins/contrib/*
