@@ -9,6 +9,7 @@ pass = "PaSsWoRd"
 
 
 [plugins]
+admin = true
 bing = true
 cid = true
 google = true
