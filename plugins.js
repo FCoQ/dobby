@@ -43,6 +43,20 @@ exports.startPlugins = function(dobby) {
     })
 }
 
+exports.getHelpMessage = function() {
+    var res = "";
+
+    ([].concat.apply([], plugins.filter(function(item) {
+        return (typeof item.help) != "undefined";
+    }).map(function(item) {
+        return item.help;
+    }))).map(function(item) {
+        res += "[I]" + item[0] + "[/I]: " + item[1] + "\n";
+    });
+
+    return res;
+}
+
 exports.onMessage = function(msg, dobby) {
 	plugins.forEach(function(item) {
 		if (typeof item.onMessage == "function") {

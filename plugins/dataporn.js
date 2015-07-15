@@ -2,6 +2,10 @@
 
 var unirest = require('unirest');
 
+exports.help = [
+    [".dataporn", "Random stimulating image from reddit"]
+]
+
 exports.onMessage = function(msg, dobby) {
 
     if (msg == '.dataporn') {

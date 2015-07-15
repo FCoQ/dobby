@@ -2,6 +2,9 @@
 
 var unirest = require('unirest');
 
+exports.help = [
+    [".ud <terms>", "Display an urban dictionary definition"]
+]
 
 exports.onMessage = function(msg, dobby) {
     var terms = msg.split(" ");

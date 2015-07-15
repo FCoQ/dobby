@@ -12,6 +12,10 @@ exports.config = function(config){
     key = config.key
 };
 
+exports.help = [
+    ["!howhot[ <username>]", "Get the temperature where you live (based on IP) or of another user"]
+]
+
 exports.onMessage = function(msg, dobby) {
     var terms = msg.split(" ");
     var command = terms.shift();
