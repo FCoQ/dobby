@@ -108,6 +108,9 @@ require('./config').init(function(config) {
     };
 
     var generic_helpers = {
+        server_info: function(cb) {
+            supervisor.get_server_info(cb)
+        },
         client_list: function(cb) {
             supervisor.get_client_list(function(err, response) {
                 if (err) {
