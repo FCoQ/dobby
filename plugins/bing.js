@@ -2,6 +2,10 @@
 
 var unirest = require('unirest');
 
+exports.help = [
+    [".bing <terms>", "Search for an image on Bing"]
+]
+
 exports.onMessage = function(msg, dobby) {
     var terms = msg.split(" ");
     var command = terms.shift();

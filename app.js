@@ -108,6 +108,9 @@ require('./config').init(function(config) {
     };
 
     var generic_helpers = {
+        help_message: function() {
+            return plugins.getHelpMessage();
+        },
         server_info: function(cb) {
             supervisor.get_server_info(cb)
         },
@@ -209,6 +212,7 @@ require('./config').init(function(config) {
 
                                     this.client_list = generic_helpers.client_list;
                                     this.find_clients = generic_helpers.find_clients;
+                                    this.help_message = generic_helpers.help_message;
                                 });
                             });
                             cb();

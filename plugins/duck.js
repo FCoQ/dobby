@@ -2,6 +2,10 @@
 
 var unirest = require('unirest');
 
+exports.help = [
+    ["!<bang> <terms>", "Use a duckduckgo bang such as !ipt"]
+]
+
 exports.onMessage = function(msg, dobby) {
     var terms = msg.split(" ");
     var command = terms.shift();
