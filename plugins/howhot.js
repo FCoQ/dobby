@@ -13,7 +13,7 @@ exports.config = function(config){
 };
 
 exports.help = [
-    ["!howhot[ <username>]", "Get the temperature where you live (based on IP) or of another user"]
+    [".howhot[ <username>]", "Get the temperature where you live (based on IP) or of another user"]
 ]
 
 exports.onMessage = function(msg, dobby) {
