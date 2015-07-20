@@ -17,6 +17,7 @@ google = true
 howhot = true
 img = true
 ud = true
+random = true
 
 # these are uids of admins
 [admins]
