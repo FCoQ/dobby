@@ -21,6 +21,7 @@
         "better-console": "*",
         "node-teamspeak": "qshane/node-teamspeak",
         "async": "*",
-        "unirest": "*"
+        "unirest": "*",
+        "flat-file-db": "*"
     }
 }
