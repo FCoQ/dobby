@@ -20,3 +20,6 @@ node-teamspeak
 
 # contrib plugins
 plugins/contrib/*
+
+# dobby flatfile cache
+dobby.db
