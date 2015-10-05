@@ -19,7 +19,12 @@ require('./config').init(function(config) {
     console.info("Loading plugins...");
     var plugins = require('./plugins').init(config.get("plugins"));
 
-    var supervisor = new bot(config, config.get("bot.name"), 1);
+    var default_channel_id = 1;
+    if (config.get("server.cid") != undefined) {
+        default_channel_id = config.get("server.cid");
+    }
+
+    var supervisor = new bot(config, config.get("bot.name"), default_channel_id);
 
     var ctx = {
         watchers: {},
