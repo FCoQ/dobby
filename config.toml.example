@@ -6,6 +6,7 @@ host = "127.0.0.1"
 port = 10011
 user = "serveradmin"
 pass = "PaSsWoRd"
+cid = 1
 
 
 [plugins]
