@@ -11,51 +11,72 @@ exports.help = [
     [".wa[ <terms>]", "Full access to Wolfram API. "]
 ]
 
+function parse(input){
+    var render = {text: "", img: ""}
+    for(var a=0; a<input.queryresult.pod.length; a++)
+    {
+        var pod = input.queryresult.pod[a]
+
+        if (a == 1 || pod.$.title == "Decimal approximation" || pod.$.primary == "true" || pod.$.title == "Plot"){
+            for(var b=0; b<pod.subpod.length; b++)
+            {
+                var subpod = pod.subpod[b];
+                for(var c=0; c<subpod.img.length; c++)
+                {
+                    var text = subpod.img[c];
+                    render.img = text.$.src;
+                }
+                for(var d=0; d<subpod.plaintext.length; d++)
+                {
+                    var text = subpod.plaintext[d];
+                    render.text = text;
+                }
+            }
+        }
+    }
+    return render
+}
+
 exports.onMessage = function(msg, dobby) {
     var terms = msg.split(" ");
     var command = terms.shift();
     terms = terms.join(" ");
 
     if (command == '.wa' || command == '.calc'){
-        unirest.get('https://api.wolframalpha.com/v2/query')
-            .query({input: terms, appid: key})
-            .end(function(response){
-                if (response.status == 200){
-                    dobby.respond('Successfully got teh data from teh wolfie')
-                    var xml = response.body;
-                    parseString(xml, function(err, result){
+            if (dobby.cache.has("wolfram:" + terms)){
+                //db has terms already stored, eventually do something here
+                console.log('has terms')
+                var result = dobby.cache.get("wolfram:" + terms)
+                var render = parse(result)
 
-                        fs.writeFile('json.out', JSON.stringify(result), function (err) {
-                            if (err) return console.log(err)
-                        })
-                        console.log('outputted in teh file pls')
+                dobby.respond(render.text + " [b][url=" +  render.img + "]image[/url][/b]")
 
-                        if ((result['queryresult']['$']['success']) == "true"){
-                            var printed = false;
-                            result['queryresult']['pod'].forEach(function(pod, i) {
-                                if (i == 1 || pod['$']['title'] == "Decimal approximation"){
-                                    if (typeof pod['subpod'][0]['plaintext'][0] == "string"){
-                                        dobby.respond(pod['subpod'][0]['plaintext'][0])
-                                        if (typeof pod['subpod'][0]['img'][0]['$']['src'] == 'string') {
-                                            dobby.respond('[URL]' + pod['subpod'][0]['img'][0]['$']['src'] + '[/URL]')
-                                        }
-                                        printed = true
-                                    }
-                                }
-                            });
-                            if (!printed){
-                                dobby.respond("Couldn't represent result as plaintext.");
+            } else {
+                unirest.get('https://api.wolframalpha.com/v2/query')
+                    .query({input: terms, appid: key})
+                    .end(function(response){
+                        if (response.status == 200){
+                            var xml = response.body;
+                            parseString(xml, function(err, result){
+                                fs.writeFile('json.out', '', function(){console.log('done')})
+                                fs.writeFile('json.out', JSON.stringify(result), function (err) {
+                                    if (err) return console.log(err)
+                                })
+                            if((result['queryresult']['$']['success']) == "true"){
+                                dobby.cache.put("wolfram:" + terms, result)
+                                var render = parse(result)
+                                dobby.respond(render.text + " [b][url=" +  render.img + "]image[/url][/b]")
+
+
                             }
-                            //dobby.respond(JSON.stringify(result['queryresult']['pod'][0]['subpod'][0]['plaintext'][0]));
+                            });
+
                         } else {
-                            dobby.respond('Invalid query')
+                            dobby.respond('No response')
                         }
+                    })
+            }
 
-                    });
 
-                } else {
-                    dobby.respond('No response')
-                }
-            })
     }
 }
