@@ -45,7 +45,7 @@ exports.onMessage = function(msg, dobby) {
     if (command == '.wa' || command == '.calc'){
             if (dobby.cache.has("wolfram:" + terms)){
                 //db has terms already stored, eventually do something here
-                console.log('has terms')
+                //console.log('has terms')
                 var result = dobby.cache.get("wolfram:" + terms)
                 var render = parse(result)
 
@@ -58,17 +58,17 @@ exports.onMessage = function(msg, dobby) {
                         if (response.status == 200){
                             var xml = response.body;
                             parseString(xml, function(err, result){
-                                fs.writeFile('json.out', '', function(){console.log('done')})
+                                /*fs.writeFile('json.out', '', function(){console.log('done')})
                                 fs.writeFile('json.out', JSON.stringify(result), function (err) {
                                     if (err) return console.log(err)
-                                })
-                            if((result['queryresult']['$']['success']) == "true"){
-                                dobby.cache.put("wolfram:" + terms, result)
-                                var render = parse(result)
-                                dobby.respond(render.text + " [b][url=" +  render.img + "]image[/url][/b]")
+                                })*/
+                                if((result['queryresult']['$']['success']) == "true"){
+                                    dobby.cache.put("wolfram:" + terms, result)
+                                    var render = parse(result)
+                                    dobby.respond(render.text + " [b][url=" +  render.img + "]image[/url][/b]")
 
 
-                            }
+                                }
                             });
 
                         } else {
