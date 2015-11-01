@@ -1,27 +1,28 @@
 {
-    "name": "dobby",
-    "private": true,
-    "version": "0.0.1",
-    "author": "FCoQ <me@quibs.org>",
-    "description": "TS3 bot",
-    "scripts": {
-        "start": "nodejs app.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/FCoQ/dobby.git"
-    },
-    "keywords": [
-        "teamspeak",
-        "ts3",
-        "bot"
-    ],
-    "dependencies": {
-        "toml": "*",
-        "better-console": "*",
-        "node-teamspeak": "qshane/node-teamspeak",
-        "async": "*",
-        "unirest": "*",
-        "flat-file-db": "*"
-    }
+  "name": "dobby",
+  "private": true,
+  "version": "0.0.1",
+  "author": "FCoQ <me@quibs.org>",
+  "description": "TS3 bot",
+  "scripts": {
+    "start": "nodejs app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FCoQ/dobby.git"
+  },
+  "keywords": [
+    "teamspeak",
+    "ts3",
+    "bot"
+  ],
+  "dependencies": {
+    "async": "*",
+    "better-console": "*",
+    "flat-file-db": "*",
+    "node-teamspeak": "qshane/node-teamspeak",
+    "toml": "*",
+    "unirest": "*",
+    "xml2js": "^0.4.12"
+  }
 }
