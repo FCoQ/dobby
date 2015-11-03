@@ -145,7 +145,7 @@ require('./config').init(function(config) {
                                 if(err) {
                                     cb(false)
                                 }else{
-                                    if(name.toLowerCase().match(partial.toLowerCase())){
+                                    if(name.toString().toLowerCase().match(partial.toLowerCase())){
                                         cb(true)
                                     }else{
                                         cb(false)
