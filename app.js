@@ -116,6 +116,9 @@ require('./config').init(function(config) {
 
         var generic_helpers = {
             cache: cache,
+            send: function(cmd, options, cb) {
+                supervisor.send(cmd, options, cb);
+            },
             help_message: function() {
                 return plugins.getHelpMessage();
             },
@@ -195,10 +198,6 @@ require('./config').init(function(config) {
                                         this.cid = client.cid;
                                         this.client_from = new Client(data.invokerid, data.invokername);
 
-                                        this.send = function(cmd, options, cb) {
-                                            supervisor.send(cmd, options, cb);
-                                        }
-
                                         this.respond = function(msg, cb) {
                                             if (msg.length >= 500) {
                                                 msg = msg.substr(0, 500) + "[...]";
@@ -222,6 +221,7 @@ require('./config').init(function(config) {
                                         this.find_clients = generic_helpers.find_clients;
                                         this.help_message = generic_helpers.help_message;
                                         this.cache = generic_helpers.cache;
+                                        this.send = generic_helpers.send;
                                     });
                                 });
                                 cb();
