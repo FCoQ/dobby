@@ -116,6 +116,9 @@ require('./config').init(function(config) {
 
         var generic_helpers = {
             cache: cache,
+            with: function(cb) {
+                cb(supervisor)
+            },
             send: function(cmd, options, cb) {
                 supervisor.send(cmd, options, cb);
             },
