@@ -25,15 +25,18 @@ exports.config = function(config){
 exports.init = function(dobby){
     ctx.server.on('connection', function(socket){
         var auth = false;
+        socket.on('error', function() {
+            
+        })
         socket.on('close', function(){
             //TODO fix this
-            painters.pop()
+            ctx.painters.pop()
         });
         socket.on('data', function(data){
             if (auth == false){
                 if (data.password == password){
                     auth = true;
-                    painters.push(socket)
+                    ctx.painters.push(socket)
                 } else {
                     socket.end()
                 }
@@ -53,13 +56,15 @@ exports.onMessage = function(msg, dobby) {
     var command = terms.shift();
     //terms = terms.join(" ");
 
+    var content = terms.pop();
+
     if ((command == '.paint' || command == '.p') && dobby.cid == chanID) {
         if (ctx.painters.length != 1){
             dobby.respond('No painters available.')
         } else {
             ctx.painters[0].write({
-                styles: ['https://quibs.org/s/1448682826-75cdda.png'],
-                content: 'https://quibs.org/s/1448682860-cec01b.png'
+                styles: [terms],
+                content: content
             })
         }
     }
