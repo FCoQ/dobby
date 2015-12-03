@@ -20,6 +20,7 @@
     "async": "*",
     "better-console": "*",
     "flat-file-db": "*",
+    "json-over-tcp": "^0.3.2",
     "node-teamspeak": "qshane/node-teamspeak",
     "toml": "*",
     "unirest": "*",
