@@ -46,7 +46,7 @@ exports.init = function(dobby){
         });
         socket.on('close', function(){
             //TODO fix this
-            editIcon(red);
+            editIcon(dobby, red);
             ctx.painters.pop()
         });
         socket.on('data', function(data){
@@ -54,20 +54,20 @@ exports.init = function(dobby){
                 if (data.password == password){
                     auth = true;
                     ctx.painters.push(socket);
-                    editIcon(green);
+                    editIcon(dobby, green);
                 } else {
                     socket.end()
                 }
             } else {
                 switch (data.status){
                     case 2:
-                        editIcon(green);
+                        editIcon(dobby, green);
                         break;
                     case 1:
-                        editIcon(yellow);
+                        editIcon(dobby, yellow);
                         break;
                     default:
-                        editIcon(red);
+                        editIcon(dobby, red);
                         break;
                 }
                 dobby.with(function(supervisor){
