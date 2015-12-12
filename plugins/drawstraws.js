@@ -12,7 +12,7 @@ exports.onMessage = function(msg, dobby) {
         if (terms.length != -1) {
             var winner = terms[Math.floor(Math.random() * terms.length)];
             if (typeof winner == 'undefined') {
-                dobby.respond("[b]Invalid input:[/b] .drawstaws name1 name2 name3")
+                dobby.respond("[b]Invalid input:[/b] .drawstraws name1 name2 name3")
             } else {
                 dobby.respond('Winner: ' + '[b]' + winner + '[/b]')
             }
