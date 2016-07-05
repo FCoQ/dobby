@@ -20,7 +20,7 @@ exports.onMessage = function(msg, dobby) {
                 if(typeof results[0] == 'undefined'){
                     dobby.respond('No results!');
                 } else {
-                    dobby.respond('[url]' + JSON.stringify(results[0].url).replace(/\"/g, "") + '[/url]');
+                    dobby.respond('[url]' + JSON.stringify(results[0]).replace(/\"/g, "") + '[/url]');
                 }
             }
         }
